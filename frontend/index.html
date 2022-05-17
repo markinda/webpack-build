@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="ru">
+    <head>
+        <base href="/" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta content="true" name="HandheldFriendly" />
+        <meta content="width" name="MobileOptimized" />
+        <meta content="yes" name="apple-mobile-web-app-capable" />
+        <title>webpack-build</title>
+    </head>
+
+    <body>
+        <div id="root">
+            <%= require('html-loader!./html/header.html').default %>
+
+            <!--      content      -->
+
+            <%= require('html-loader!./html/footer.html').default %>
+        </div>
+    </body>
+
+</html>
