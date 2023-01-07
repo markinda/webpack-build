@@ -3,53 +3,46 @@ const {CleanWebpackPlugin} = require('clean-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const {ESBuildMinifyPlugin} = require('esbuild-loader')
 const fs = require('fs');
 
 const PATHS = {
-  src: path.join(__dirname, './frontend'),
-  dist: path.join(__dirname, './build'),
+  frontend: path.join(__dirname, './frontend'),
+  build: path.join(__dirname, './build'),
 };
 
-const PAGES_DIR = `${PATHS.src}/html`;
-const PAGES = fs.readdirSync(`${PATHS.src}/html`).filter(fileName => fileName.endsWith('.html'));
+const isProd = process.env.NODE_ENV === 'production';
+
+const PAGES = fs.readdirSync(`${PATHS.frontend}/html`).filter(fileName => fileName.endsWith('.html'));
+
+console.log(process.env.NODE_ENV);
 
 module.exports = {
-  mode: 'development',
+  mode: process.env.NODE_ENV,
   cache: false,
   devServer: {
     static: {
-      directory: PATHS.dist,
+      directory: PATHS.build,
     },
     open: true,
     compress: true,
+    hot: true,
     port: 3000,
   },
   entry: {
-    main: `${PATHS.src}/index.js`,
+    main: `${PATHS.frontend}/index.js`,
   },
   output: {
-    path: PATHS.dist,
+    path: PATHS.build,
     filename: 'script/[name].bundle.js',
     assetModuleFilename: '[name][ext]',
   },
+  devtool: isProd ? false : 'eval',
   optimization: {
-    minimize: true,
-    minimizer: [
-      new ESBuildMinifyPlugin({
-        target: 'es2015',
-        css: true,
-        minify: true,
-        legalComments: "none",
-        ignoreAnnotations: true,
-        treeShaking: true,
-        pure: [true]
-      }),
-    ],
+    minimize: isProd,
   },
   plugins: [
     ...PAGES.map(page => new HtmlWebpackPlugin({
-      template: `${PAGES_DIR}/${page}`,
+      template: `${PATHS.frontend}/html/${page}`,
       filename: `./${page}`,
       // excludeAssets: [
       //     /\.css$/,
@@ -62,7 +55,7 @@ module.exports = {
     }),
     new CopyWebpackPlugin({
       patterns: [
-        {from: `${PATHS.src}/assets/`, to: "../build/assets/"},
+        {from: `${PATHS.frontend}/assets/`, to: "../build/assets/"},
       ],
     }),
   ],
